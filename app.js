@@ -104,21 +104,24 @@ function drawBoardGame(colsCount, cellsByRowCount) {
   board.appendChild(upperRow); // creates a div inside the board for the upperRow
   board.appendChild(lowerRow); // creates a div inside the board for the lowerRow
 
+  // Why do this inside the function ???????? Because of the scope of col ????????
   const cols = board.querySelectorAll(".col");
-  console.log("all the board columns", cols); // print all the columns
+  // console.log("all the board columns", cols); // print all the columns
   cols.forEach(col => {
     col.onclick = moveChecker; // for each column, if we click on the columnn, we call the moveChecker function
   });
 }
 
-// ???????????
+// Draw the checkers
 function drawAChecker(colIndx, cellIndx, color, boardRow) {
+  // each checker has a column index, a cell index & a color
   const currentCol = document.querySelectorAll(".col")[colIndx];
   const currentCell = currentCol.querySelectorAll(".cell")[cellIndx];
   const checker = document.createElement("div");
   checker.className = "checker " + color;
   checker.setAttribute("data-col-index", colIndx);
   checker.setAttribute("data-col-position", cellIndx); // check this value, it's wrong now
+
   checker.onclick = selectChecker;
   currentCell.appendChild(checker);
 }
@@ -129,12 +132,29 @@ function selectChecker(evt) {
   //const cols = document.querySelectorAll(".cols");
   if (previous) previous.classList.remove("is-selected");
   this.classList.toggle("is-selected");
+  listenColsClick();
 }
 
-function listenColsClick() {}
+function listenColsClick() {
+  // Susan :
+  if (document.querySelector(".checker.is-selected")) {
+    moveChecker();
+  }
+  // cels.forEach(col => {
+  //   col.onclick = SelectCol;
+
+  //   checkers.forEach((col, colIndx) => {
+  //     col.forEach((cellVal, cellIndx) => {
+  //       if (cellVal === 0 && ) {
+  //         drawAChecker(colIndx, cellIndx, color);
+  //       }
+  //}}
+  // });
+}
 
 function eraseAChecker() {
-  // check if position is taken
+  // Susan :
+  //if (futureposition contains same color checker){erase last position checker and draw new checker in futureposition just after the last existing checker if any}
 }
 
 function parseCheckersPosition(checkers, color) {
@@ -158,7 +178,7 @@ function moveChecker(evt) {
     targetColumn = targetColumn.parentElement;
     //   console.log(target);
   }
-  console.log(targetColumn, activeChecker);
+  // console.log(targetColumn, activeChecker);
 }
 
 drawBoardGame(12, 6); // setting the parameters for the board
@@ -169,3 +189,35 @@ parseCheckersPosition(whiteCheckers.intialpositions, "white");
 /**
  * EVENT LISTENERS
  */
+
+// ************* TO DO LIST *************
+
+// ****** DIRECTIONS :
+// black checkers can only go from left to right in upperRow and from right to left in lowerRow
+// white checkers can only go from right to left in upperRow and from left to right in lowerRow
+
+// ****** MOVE RULES :
+// when dice roll, only the checkers of the current player can move
+// and only if there aren't the other player's checkers on the next move column
+// if double (same number on the dice), the player can do 4 moves of the number (not 2)
+// when no more space in the 6 rows column, to pile up the checkers, the first cell of the column shall display 2, 3, 4 etc. (as many checkers as there are piling up)
+// checker cannot go anywhere else than checker's current position + dice number
+// if home zone of the opponent has at least 2 checkers on each column,and the player has at least a checker in jail, he cannot play as long as 1 column doesn't have only 1 checker
+
+// ****** EATING/JAIL RULES :
+// if there's only one checker of the opposite color in the possible next move column, it can be "eaten", which means it's replaced
+// when eaten, a checker goes in the jail zone and for it's next dice roll, it will have to start by placing the checker that's in the jail on the board
+
+// ****** OUT RULES :
+// checkers can go out only if all are in the home zone
+// when going out, they end up in the out zone
+// the first one who has all its checkers in the out zone wins
+
+// create start button with random color pick to start
+// create dice with random numbers from 1 to 6
+// create roll the dice button
+// create pop up window for the winner
+// create info (?) button with pop up window with the rules
+// create jail zone
+// create out zone
+// create zone saying who's turn it is
