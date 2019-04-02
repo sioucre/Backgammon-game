@@ -5,7 +5,7 @@
 // Initializing the black checkers' positions
 var blackCheckers = {
   injail: [],
-  intialpositions: [
+  intialPositions: [
     // row A => cols (top part of the board)
     [0, 0, 0, 0, 0, 0], // col A0
     [0, 0, 0, 0, 0, 0], // col A1
@@ -37,7 +37,7 @@ var blackCheckers = {
 // Initializing the white checkers' positions
 var whiteCheckers = {
   injail: [],
-  intialpositions: [
+  intialPositions: [
     // row A => cols (top part of the board)
     [1, 1, 1, 1, 1, 0], // col A0
     [0, 0, 0, 0, 0, 0], // col A1
@@ -87,7 +87,7 @@ function drawBoardGame(colsCount, cellsByRowCount) {
       col.style.gridTemplateRows = `repeat(${cellsByRowCount}, 60px)`; // applying some style (the same style actually for each row) to each column
       col.className = "col"; // give it a class
       col.setAttribute("data-col-index", rowId + i); // each column is set an attribute data-col-index, which is a combination of the big row (A or B) and the column
-
+      col.onclick = listenColsClick;
       for (let j = 0; j <= cellsByRowCount; j++) {
         const cell = document.createElement("div"); // we create a div for each cell (6 per column per big row)
         cell.className = "cell"; // git it a class
@@ -103,13 +103,6 @@ function drawBoardGame(colsCount, cellsByRowCount) {
 
   board.appendChild(upperRow); // creates a div inside the board for the upperRow
   board.appendChild(lowerRow); // creates a div inside the board for the lowerRow
-
-  // Why do this inside the function ???????? Because of the scope of col ????????
-  const cols = board.querySelectorAll(".col");
-  // console.log("all the board columns", cols); // print all the columns
-  cols.forEach(col => {
-    col.onclick = moveChecker; // for each column, if we click on the columnn, we call the moveChecker function
-  });
 }
 
 // Draw the checkers
@@ -132,13 +125,19 @@ function selectChecker(evt) {
   //const cols = document.querySelectorAll(".cols");
   if (previous) previous.classList.remove("is-selected");
   this.classList.toggle("is-selected");
-  listenColsClick();
 }
 
-function listenColsClick() {
-  // Susan :
+function checkMoveIsValid() {
+  return true; // à changer à terme lorsque je définierai les règles de déplacement
+}
+
+function listenColsClick(evt) {
+  const colDest = this;
   if (document.querySelector(".checker.is-selected")) {
-    moveChecker();
+    console.log("yo at listencols clicks");
+    if (checkMoveIsValid()) {
+      moveChecker(colDest, selectCheckerToMove());
+    }
   }
   // cels.forEach(col => {
   //   col.onclick = SelectCol;
@@ -152,13 +151,37 @@ function listenColsClick() {
   // });
 }
 
+function selectCheckerToMove() {
+  const activeChecker = document.querySelector(".checker.is-selected");
+  const targetColumn = activeChecker.parentElement.parentElement;
+  const lastCheckers = targetColumn.querySelectorAll(".cell:not(:empty)");
+  const index =
+    targetColumn.parentElement.id === "upper_row"
+      ? lastCheckers.length - 1
+      : lastCheckers.length - 1;
+  // console.log(
+  //   targetColumn,
+  //   activeChecker,
+  //   lastCheckers,
+  //   index,
+  //   lastCheckers[index]
+  // );
+  return lastCheckers[index];
+}
+
+function moveChecker(destCol, checker) {
+  console.log("@movechecker", destCol, checker);
+}
+
 function eraseAChecker() {
   // Susan :
   //if (futureposition contains same color checker){erase last position checker and draw new checker in futureposition just after the last existing checker if any}
+  // if (document.querySelector(".checker.is-selected")
+  // .parentNode.removeChild();
 }
 
-function parseCheckersPosition(checkers, color) {
-  checkers.forEach((col, colIndx) => {
+function parseCheckersPosition(intialPositions, color) {
+  intialPositions.forEach((col, colIndx) => {
     col.forEach((cellVal, cellIndx) => {
       // console.log(cellIndx, cellVal);
       if (cellVal === 1) {
@@ -170,21 +193,14 @@ function parseCheckersPosition(checkers, color) {
   });
 }
 
-function moveChecker(evt) {
-  var targetColumn = evt.srcElement || evt.target;
-  var activeChecker = document.querySelector(".checker.is-selected");
-
-  while (!targetColumn.classList.contains("col")) {
-    targetColumn = targetColumn.parentElement;
-    //   console.log(target);
-  }
-  // console.log(targetColumn, activeChecker);
-}
+// Susan :
+// eraseAChecker();
+// console.log(targetColumn, activeChecker);
 
 drawBoardGame(12, 6); // setting the parameters for the board
 
-parseCheckersPosition(blackCheckers.intialpositions, "black");
-parseCheckersPosition(whiteCheckers.intialpositions, "white");
+parseCheckersPosition(blackCheckers.intialPositions, "black");
+parseCheckersPosition(whiteCheckers.intialPositions, "white");
 
 /**
  * EVENT LISTENERS
